@@ -1,0 +1,937 @@
+-- ⚠️ IMPORTANT: Put this code at the VERY TOP of your Main Script (before obfuscating) ⚠️
+
+local ProtectionConfig = {
+    -- 🔴 CRITICAL: This MUST exactly match the 'Secret' value in your Key System's Config!
+    -- If your Key System has: Secret = "Test"
+    -- Then this must also be: SecretKey = "Test"
+    SecretKey = "KazeeHub010614",
+    
+    -- The name of your Hub (shown in the kick message if they try to bypass)
+    HubName = "KAZEE HUB"
+}
+
+-- Anti-Bypass Logic: Checks if the Key System successfully set the global variable
+if not _G[ProtectionConfig.SecretKey] then
+    local player = game:GetService("Players").LocalPlayer
+    if player then
+        player:Kick("\n🛡️ Unauthorized Execution 🛡️\n\nPlease use the official Key System to run " .. ProtectionConfig.HubName)
+    end
+    return -- Stops the rest of the script from loading!
+end
+
+-------------------------------------------------------------------------------
+-- 👇 YOUR MAIN SCRIPT CODE STARTS HERE 👇
+-------------------------------------------------------------------------------
+
+print(ProtectionConfig.HubName .. " Loaded Successfully!")
+
+
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+
+-- ==========================================
+-- LOADING SCREEN
+-- ==========================================
+do
+    local CoreGui = game:GetService("CoreGui")
+    local TweenService = game:GetService("TweenService")
+
+    local LoadingGui = Instance.new("ScreenGui")
+    LoadingGui.Name = "KazeeHubLoadingScreen"
+    LoadingGui.ResetOnSpawn = false
+    
+    pcall(function()
+        if syn and syn.protect_gui then
+            syn.protect_gui(LoadingGui)
+            LoadingGui.Parent = CoreGui
+        elseif gethui then
+            LoadingGui.Parent = gethui()
+        else
+            LoadingGui.Parent = CoreGui
+        end
+    end)
+    if not LoadingGui.Parent then LoadingGui.Parent = CoreGui end
+
+    local FullScreenBg = Instance.new("ImageLabel")
+    FullScreenBg.Name = "FullScreenBackground"
+    FullScreenBg.Size = UDim2.new(1, 0, 1, 0)
+    FullScreenBg.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+    FullScreenBg.Image = "rbxassetid://124125593087369"
+    FullScreenBg.ScaleType = Enum.ScaleType.Crop
+    FullScreenBg.Parent = LoadingGui
+
+    local Overlay = Instance.new("Frame")
+    Overlay.Size = UDim2.new(1, 0, 1, 0)
+    Overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    Overlay.BackgroundTransparency = 0.4
+    Overlay.Parent = FullScreenBg
+
+    local LogoImg = Instance.new("ImageButton")
+    LogoImg.Size = UDim2.new(0, 75, 0, 75)
+    LogoImg.AnchorPoint = Vector2.new(0.5, 0.5)
+    LogoImg.Position = UDim2.new(0.5, 0, 0.42, 0)
+    LogoImg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    LogoImg.Image = "rbxassetid://124125593087369"
+    LogoImg.ScaleType = Enum.ScaleType.Fit
+    LogoImg.Parent = FullScreenBg
+
+    local LogoCorner = Instance.new("UICorner")
+    LogoCorner.CornerRadius = UDim.new(1, 0)
+    LogoCorner.Parent = LogoImg
+
+    local LogoStroke = Instance.new("UIStroke")
+    LogoStroke.Color = Color3.fromRGB(255, 60, 120)
+    LogoStroke.Thickness = 2.5
+    LogoStroke.Parent = LogoImg
+
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Size = UDim2.new(1, 0, 0, 40)
+    TitleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    TitleLabel.Position = UDim2.new(0.5, 0, 0.52, 0)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Text = "KAZEE HUB V3.0 PREMIUM"
+    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TitleLabel.TextSize = 24
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.Parent = FullScreenBg
+
+    local PercentLabel = Instance.new("TextLabel")
+    PercentLabel.Size = UDim2.new(1, 0, 0, 40)
+    PercentLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    PercentLabel.Position = UDim2.new(0.5, 0, 0.60, 0)
+    PercentLabel.BackgroundTransparency = 1
+    PercentLabel.Text = "0%"
+    PercentLabel.TextColor3 = Color3.fromRGB(255, 60, 120)
+    PercentLabel.TextSize = 32
+    PercentLabel.Font = Enum.Font.GothamBold
+    PercentLabel.Parent = FullScreenBg
+
+    local SkipLabel = Instance.new("TextLabel")
+    SkipLabel.Size = UDim2.new(1, 0, 0, 20)
+    SkipLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    SkipLabel.Position = UDim2.new(0.5, 0, 0.88, 0)
+    SkipLabel.BackgroundTransparency = 1
+    SkipLabel.Text = "TAP ANYWHERE TO SKIP"
+    SkipLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    SkipLabel.TextSize = 13
+    SkipLabel.Font = Enum.Font.GothamMedium
+    SkipLabel.Parent = FullScreenBg
+
+    local dismissed = false
+    local function dismissLoading()
+        if dismissed then return end
+        dismissled = true
+
+        TweenService:Create(FullScreenBg, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+        TweenService:Create(Overlay, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+        TweenService:Create(LogoImg, TweenInfo.new(0.5), {ImageTransparency = 1, BackgroundTransparency = 1}):Play()
+        TweenService:Create(LogoStroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
+        TweenService:Create(TitleLabel, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+        TweenService:Create(PercentLabel, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+        TweenService:Create(SkipLabel, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+
+        task.wait(0.5)
+        LoadingGui:Destroy()
+    end
+
+    FullScreenBg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dismissLoading()
+        end
+    end)
+
+    task.spawn(function()
+        local duration = 2.0
+        local elapsed = 0
+        while elapsed < duration and not dismissed do
+            local dt = task.wait()
+            elapsed = elapsed + dt
+            local progress = math.clamp(elapsed / duration, 0, 1)
+            PercentLabel.Text = math.floor(progress * 100) .. "%"
+        end
+        if not dismissed then
+            PercentLabel.Text = "100%"
+            task.wait(0.2)
+            dismissLoading()
+        end
+    end)
+end
+
+-- ==========================================
+-- FLUENT WINDOW CREATION
+-- ==========================================
+local Window = Fluent:CreateWindow({
+    Title = "KAZEE HUB V3.0 PREMIUM",
+    SubTitle = "by Kazee",
+    TabWidth = 150,
+    Size = UDim2.fromOffset(480, 360),
+    Acrylic = true,
+    Theme = "Rose",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+Fluent:SetTheme("Rose")
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "box" }),
+    Creator = Window:AddTab({ Title = "Creator", Icon = "user-check" }),
+    Kazee = Window:AddTab({ Title = "Kazee Script", Icon = "code" }),
+    SAE = Window:AddTab({ Title = "SAE Scripts", Icon = "layers" }),
+    JFA = Window:AddTab({ Title = "JFA Scripts", Icon = "star" }),
+    AnimeDice = Window:AddTab({ Title = "Anime Dice Scripts", Icon = "box" }),
+    SAB = Window:AddTab({ Title = "SAB Scripts", Icon = "cpu" }),
+    SAK = Window:AddTab({ Title = "SAK Scripts", Icon = "command" }),
+    RAP = Window:AddTab({ Title = "RAP Scripts", Icon = "terminal" }),
+    Karinderya = Window:AddTab({ Title = "Karinderya Scripts", Icon = "utensils" }),
+    BloxFruit = Window:AddTab({ Title = "Blox Fruit Scripts", Icon = "compass" }),
+    MM2 = Window:AddTab({ Title = "MM2 Scripts", Icon = "layers" }),
+    BladeBall = Window:AddTab({ Title = "Blade Ball Scripts", Icon = "target" }),
+    TSB = Window:AddTab({ Title = "TSB Scripts", Icon = "sword" }),
+    Rivals = Window:AddTab({ Title = "Rivals Scripts", Icon = "crosshair" }),
+    Nights99 = Window:AddTab({ Title = "99 Nights Scripts", Icon = "moon" }),
+    Shaders = Window:AddTab({ Title = "Shaders Scripts", Icon = "sun" }),
+    Emotes = Window:AddTab({ Title = "Emotes", Icon = "smile" }),
+    Avatars = Window:AddTab({ Title = "Avatars", Icon = "user" }),
+    Promoters = Window:AddTab({ Title = "Promoters", Icon = "users" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+-- ==========================================
+-- FLOATING TOGGLE & PROFILE HUD (MOVABLE)
+-- ==========================================
+do
+    local CoreGui = game:GetService("CoreGui")
+    local RunService = game:GetService("RunService")
+    local Players = game:GetService("Players")
+    local UserInputService = game:GetService("UserInputService")
+    local LocalPlayer = Players.LocalPlayer
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "KazeeHubFloatingButton"
+    ScreenGui.ResetOnSpawn = false
+    
+    pcall(function()
+        if syn and syn.protect_gui then
+            syn.protect_gui(ScreenGui)
+            ScreenGui.Parent = CoreGui
+        elseif gethui then
+            ScreenGui.Parent = gethui()
+        else
+            ScreenGui.Parent = CoreGui
+        end
+    end)
+    if not ScreenGui.Parent then ScreenGui.Parent = CoreGui end
+
+    local BottomLeftContainer = Instance.new("Frame")
+    BottomLeftContainer.Size = UDim2.new(0, 240, 0, 65)
+    BottomLeftContainer.Position = UDim2.new(0, 20, 1, -85)
+    BottomLeftContainer.BackgroundTransparency = 1
+    BottomLeftContainer.Parent = ScreenGui
+
+    local FloatingBtn = Instance.new("ImageButton")
+    FloatingBtn.Size = UDim2.new(0, 55, 0, 55)
+    FloatingBtn.Position = UDim2.new(0, 0, 0.5, -27)
+    FloatingBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    FloatingBtn.Image = "rbxassetid://124125593087369"
+    FloatingBtn.ScaleType = Enum.ScaleType.Fit
+    FloatingBtn.Parent = BottomLeftContainer
+
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(1, 0)
+    UICorner.Parent = FloatingBtn
+
+    local UIStroke = Instance.new("UIStroke")
+    UIStroke.Color = Color3.fromRGB(255, 60, 120)
+    UIStroke.Thickness = 3
+    UIStroke.Parent = FloatingBtn
+
+    local ProfileFrame = Instance.new("Frame")
+    ProfileFrame.Size = UDim2.new(0, 165, 0, 50)
+    ProfileFrame.Position = UDim2.new(0, 65, 0.5, -25)
+    ProfileFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    ProfileFrame.BackgroundTransparency = 0.25
+    ProfileFrame.Parent = BottomLeftContainer
+
+    local ProfileCorner = Instance.new("UICorner")
+    ProfileCorner.CornerRadius = UDim.new(0, 8)
+    ProfileCorner.Parent = ProfileFrame
+
+    local ProfileStroke = Instance.new("UIStroke")
+    ProfileStroke.Color = Color3.fromRGB(255, 60, 120)
+    ProfileStroke.Transparency = 0.5
+    ProfileStroke.Thickness = 1.5
+    ProfileStroke.Parent = ProfileFrame
+
+    local AvatarImg = Instance.new("ImageLabel")
+    AvatarImg.Size = UDim2.new(0, 38, 0, 38)
+    AvatarImg.Position = UDim2.new(0, 6, 0.5, -19)
+    AvatarImg.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    AvatarImg.Image = "rbxassetid://0"
+    AvatarImg.Parent = ProfileFrame
+
+    local AvatarCorner = Instance.new("UICorner")
+    AvatarCorner.CornerRadius = UDim.new(1, 0)
+    AvatarCorner.Parent = AvatarImg
+
+    task.spawn(function()
+        pcall(function()
+            local content, isReady = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
+            if isReady and content then AvatarImg.Image = content end
+        end)
+    end)
+
+    local NicknameLabel = Instance.new("TextLabel")
+    NicknameLabel.Size = UDim2.new(0, 110, 0, 18)
+    NicknameLabel.Position = UDim2.new(0, 48, 0, 8)
+    NicknameLabel.BackgroundTransparency = 1
+    NicknameLabel.Text = LocalPlayer.DisplayName
+    NicknameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    NicknameLabel.TextSize = 13
+    NicknameLabel.Font = Enum.Font.GothamBold
+    NicknameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    NicknameLabel.Parent = ProfileFrame
+
+    local UsernameLabel = Instance.new("TextLabel")
+    UsernameLabel.Size = UDim2.new(0, 110, 0, 16)
+    UsernameLabel.Position = UDim2.new(0, 48, 0, 26)
+    UsernameLabel.BackgroundTransparency = 1
+    UsernameLabel.Text = "@" .. LocalPlayer.Name
+    UsernameLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    UsernameLabel.TextSize = 11
+    UsernameLabel.Font = Enum.Font.GothamMedium
+    UsernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    UsernameLabel.Parent = ProfileFrame
+
+    RunService.RenderStepped:Connect(function(dt)
+        if FloatingBtn and FloatingBtn.Parent then
+            FloatingBtn.Rotation = (FloatingBtn.Rotation + (dt * 60)) % 360
+        end
+    end)
+
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    BottomLeftContainer.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = BottomLeftContainer.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    BottomLeftContainer.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            BottomLeftContainer.Position = UDim2.new(
+                startPos.X.Scale, 
+                startPos.X.Offset + delta.X, 
+                startPos.Y.Scale, 
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    local isOpen = true
+    local clickThreshold = 5
+    local totalDrag = 0
+
+    BottomLeftContainer.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            totalDrag = 0
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            totalDrag = totalDrag + math.abs(input.Delta.X) + math.abs(input.Delta.Y)
+        end
+    end)
+
+    FloatingBtn.MouseButton1Click:Connect(function()
+        if totalDrag < clickThreshold then
+            isOpen = not isOpen
+            Window:Minimize(not isOpen)
+        end
+    end)
+end
+
+-- ==========================================
+-- TAB CONTENTS (FULL DATASET)
+-- ==========================================
+
+-- Main Tab
+Tabs.Main:AddParagraph({ Title = "Kazee Hub Multi Games", Content = "v3.0 Premium • Multi Games Hub\n\nSupporting multiple games with elite scripts and utilities." })
+Tabs.Main:AddParagraph({ Title = "— Features", Content = "" })
+Tabs.Main:AddParagraph({ Title = "Multi-Game Support", Content = "Access custom scripts across various popular Roblox games from one single hub." })
+Tabs.Main:AddParagraph({ Title = "Optimized Performance", Content = "Smooth execution, custom UI styling, and reliable script loaders." })
+Tabs.Main:AddParagraph({ Title = "— Discord", Content = "https://discord.gg/z2RvxHCKG" })
+Tabs.Main:AddButton({
+    Title = "Copy Discord Invite",
+    Description = "Copies the Discord link to your clipboard",
+    Callback = function()
+        if setclipboard then
+            setclipboard("https://discord.gg/z2RvxHCKG")
+            Fluent:Notify({ Title = "Copied!", Content = "Discord link copied to clipboard.", Duration = 3 })
+        else
+            Fluent:Notify({ Title = "Error", Content = "Your executor does not support setclipboard.", Duration = 3 })
+        end
+    end
+})
+Tabs.Main:AddParagraph({ Title = "— Credits", Content = "Made by\nKazee (@kazeeontiktok)\n\nWith\nThanks to all our discord members\n\nSupport\nThank You for your support!" })
+
+-- Creator Tab
+Tabs.Creator:AddParagraph({ Title = "Creator Information", Content = "Official creator profile and social links." })
+Tabs.Creator:AddButton({
+    Title = "Kazee’s TikTok",
+    Description = "Copies @kazeeontiktok to your clipboard",
+    Callback = function()
+        if setclipboard then
+            setclipboard("@kazeeontiktok")
+            Fluent:Notify({ Title = "Copied!", Content = "TikTok username @kazeeontiktok copied to clipboard.", Duration = 3 })
+        else
+            Fluent:Notify({ Title = "Error", Content = "Your executor does not support setclipboard.", Duration = 3 })
+        end
+    end
+})
+
+-- Kazee Tab
+Tabs.Kazee:AddParagraph({ Title = "Kazee Script Hub", Content = "Exclusive scripts for KAZEE HUB V3.0 PREMIUM." })
+Tabs.Kazee:AddButton({
+    Title = "ANTI-HIT KAZEE",
+    Description = "Executes the Anti-Hit script loader",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://flowauth.net/v1/loaders/d0f4b6a668308a55f1aabde57b9fc816.lua"))() end)
+        Fluent:Notify({ Title = "ANTI-HIT KAZEE", Content = "Anti-Hit script executed!", Duration = 4 })
+    end
+})
+
+-- SAE Tab
+Tabs.SAE:AddParagraph({ Title = "SAE Scripts Collection", Content = "Keyless community scripts, hubs, and utilities." })
+local saeScripts = {
+    {"FLOW HUB", "https://api.luarmor.net/files/v4/loaders/5946add9ab91f1e04cb005346a8b1968.lua"},
+    {"NOVA HUB", "https://raw.githubusercontent.com/NovaHubRBLX/NovaHub/refs/heads/main/novahub.lua"},
+    {"HIP HUB", "https://hiphub.cloud/api/script-roblox/loader"},
+    {"RONNIE HUB", "https://raw.githubusercontent.com/elonmod/skibidi/refs/heads/main/Ronneihub-keyless.lua"},
+    {"VINCITORE HUB", "https://raw.githubusercontent.com/idk953072-crypto/Steal-an-Egg/refs/heads/main/vincitore"},
+    {"SENA HUB", "https://raw.githubusercontent.com/senarblx/sena/refs/heads/main/loaderv2sena"},
+    {"ZEROIN HUB", "https://zeroinhub.com/api/script"},
+    {"VALINC HUB", "https://api.valincsyndicate.com/v1/releases/5502cba03703f4a3628d522d396b80d8.lua"},
+    {"V4 SENA", "https://senahub.xyz/raw/loader"},
+    {"NEVA HUB", "https://raw.githubusercontent.com/VEZ2/NEVAHUB/main/2"},
+    {"TSUO HUB", "https://raw.githubusercontent.com/Tsuo7/TsuoHub/main/stealanegg"},
+    {"CLOUT HUB", "https://raw.githubusercontent.com/ClouthubOnTop/Loader/main/main.lua"},
+    {"JOANEEE SERVER HOP", "https://raw.githubusercontent.com/DarkSuffer/SAESH/refs/heads/main/SSH.lua"},
+    {"SORHINE HUB", "https://raw.githubusercontent.com/SorhineScriptOpv1/Script/refs/heads/main/Fn-stealanegg.lua"},
+    {"MIRANDA HUB AFK", "https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/mirandaafk.lua"},
+    {"LENNON HUB", "https://api.luarmor.net/files/v4/loaders/4595fe31a5f7a8b4f4dd7071f3119ef7.lua"},
+    {"CHILLI HUB", "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"},
+    {"JANE HUB", "https://flowauth.net/v1/loaders/b88a6143b351d79f4c5a108ec33b5a2c.lua"},
+    {"WZEUS ANTI-CHASE", "https://raw.githubusercontent.com/Wzeus-NTH/Wzeusno1/main/Wzeus/nthzz"},
+    {"HORIZON HUB V2", "https://api.jnkie.com/api/v1/luascripts/public/3db06e0eaa1e4e8bf5e9d3192fa71e0bad2d1d1af5b11c0a58e6b708ad4487f4/download"},
+    {"NEXORA HUB", "https://raw.githubusercontent.com/Dayvinksthik/Script/refs/heads/main/Load.lua"},
+    {"LIMBO HUB", "https://limbohub.my.id/loader.lua"},
+    {"BK HUB", "https://api.luarmor.net/files/v4/loaders/9ee4edde227ac85f50872bf9e4226508.lua"},
+    {"PET SPAWNER", "https://raw.githubusercontent.com/chocolascript-glitch/Chocola-Pet-Spawner-steal-an-egg/refs/heads/main/script.lua"},
+    {"FYY HUB", "https://FyyCommunity.my.id"},
+    {"CRZ HUB", "https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"},
+    {"VOID SHELL HUB", "https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"},
+    {"BLYXO HUB", "https://flowauth.net/v1/loaders/69d3463240384f3a73fbe32c178093a2.lua"},
+    {"LKZ HUB", "https://api.luarmor.net/files/v4/loaders/65bf3459d87ba3ac46350e154b640929.lua"},
+    {"ON HUB", "https://raw.githubusercontent.com/davizin713/ONhub/refs/heads/main/script.lua"},
+    {"FOXNAME HUB", "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"},
+    {"CLOVER HUB", "https://cloverhub.app/clover.lua"},
+    {"DECODE HUB", "https://raw.githubusercontent.com/ItzYumi/Decode/refs/heads/main/DE%3ACODE.lua"},
+    {"SPEED X HUB", "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {"OUROBOROS HUB", "https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"},
+    {"BIG FROOT", "https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"},
+    {"OMG HUB", "https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"},
+    {"KIRA X HUB", "https://raw.githubusercontent.com/LSSOPS/OpenSource/refs/heads/main/KiraHub_Steal_An_Egg.lua"},
+    {"VORTEX X SAGE", "https://raw.githubusercontent.com/Israel-Vortex/vortex-x-scripts/refs/heads/main/Official-Vortex-Software/Dev-Project/StealAnEgg.lua"},
+    {"FAKE ADMIN", "https://flowauth.net/v1/loaders/e890aad1c32cda0a0e14d000aa06dd97.lua"},
+    {"LSS HUB", "https://raw.githubusercontent.com/LSSOPS/OpenSource/refs/heads/main/LSSHub_Steal_An_Hub.lua"},
+    {"YOKUDO HUB", "https://raw.githubusercontent.com/betdoyvaka/stealanegg/main/Loader.lua"},
+    {"VANTA BLACK HUB", "https://raw.githubusercontent.com/tranduykhanh08428-web/VantablackHub/refs/heads/main/Stealanegg.lua.txt"},
+    {"KEXX HUB", "https://raw.githubusercontent.com/premiumbuddy/kex/refs/heads/main/kexxxx"},
+    {"LEVON HUB", "https://pastefy.app/nasHhfko/raw"},
+    {"INSTANT STEAL", "https://raw.githubusercontent.com/alexisbritez2307-maker/STEAL-A-EGG-/refs/heads/main/INSTANT%20EGG%F0%9F%A5%9A%20SCRIPT%20%F0%9F%97%82%EF%B8%8F"},
+    {"VEX HUB", "https://raw.githubusercontent.com/Josh-tech-lob/Vexhub/refs/heads/main/Vexhub"},
+    {"LOOP HUB", "https://raw.githubusercontent.com/LOOPHUBB/LOOP-HUB/refs/heads/main/obfuscated.luau.txt"},
+    {"CAT HUB", "https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Cat-hub"},
+    {"JJMON HUB", "https://raw.githubusercontent.com/JJMONHUB/JJMONHUB/refs/heads/main/obfuscated.lua%20(11).txt"}
+}
+for _, data in ipairs(saeScripts) do
+    Tabs.SAE:AddButton({
+        Title = data[1],
+        Description = "Keyless script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "SAE Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- JFA Tab
+Tabs.JFA:AddParagraph({ Title = "JFA Scripts Collection", Content = "Jump For Animals scripts, hubs, and utilities." })
+Tabs.JFA:AddParagraph({ Title = "— Jin Hub Discord", Content = "discord.gg/XPdhVZTaNv" })
+Tabs.JFA:AddButton({
+    Title = "Copy Jin Hub Discord",
+    Description = "Copies the Jin Hub Discord invite to clipboard",
+    Callback = function()
+        if setclipboard then
+            setclipboard("discord.gg/XPdhVZTaNv")
+            Fluent:Notify({ Title = "Copied!", Content = "Jin Hub Discord link copied to clipboard.", Duration = 3 })
+        else
+            Fluent:Notify({ Title = "Error", Content = "Your executor does not support setclipboard.", Duration = 3 })
+        end
+    end
+})
+
+local jfaScripts = {
+    {"JIN HUB", "https://jinhub.my.id/scripts/Universal.lua"},
+    {"ROXY HUB", "https://raw.githubusercontent.com/xRoxyHubx/JumpForAnimal/refs/heads/main/main-script"},
+    {"OXIDE HUB", "https://raw.githubusercontent.com/xulfo/Oxide-Loader/main/Main.lua"},
+    {"MERCENARIES HUB", "https://raw.githubusercontent.com/kosowa02/x/refs/heads/main/JumpForAnimals"},
+    {"OUROBOROS HUB", "https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"},
+    {"TORA HUB", "https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/JumpforAnimals", true},
+    {"SYNEROX HUB", "https://synex.lat/loaders/jump-animals.lua"},
+    {"PROJECT MADARA HUB", "https://raw.githubusercontent.com/IsThisMe01/Project-Madara/refs/heads/main/jumpforanimal.lua"},
+    {"GS HUB", "https://gist.githubusercontent.com/spiritualgaming1123-beep/ac7ec178fe710cd487c990430760d875/raw/3ce1579384088189580dad9874a509f0eb595232/JumpforAnimals"},
+    {"CM HUB", "https://cmhub-key-system.vercel.app/roblox/loader.lua"},
+    {"MON HUB", "https://jnkie.com/loaders/monhub-free"},
+    {"ALTER HUB", "https://alterhub.site/loader.lua"},
+    {"CHIYO HUB", "https://raw.githubusercontent.com/kaisenlmao/loader/refs/heads/main/chiyo.lua"},
+    {"TZ HUB", "https://api.jnkie.com/api/v1/loaders/public/6b597f08f593a78bac27c070dbd92ee7f6c954a0243a79086c8dc015091fc54f/download"},
+    {"JULY HUB", "https://api.jnkie.com/api/v1/luascripts/public/7b53b88146a2ad4876c310960abf5b4e0e26442425fadc22a7b9d2d724fdff3d/download"},
+    {"TOKYO HUB", "https://raw.githubusercontent.com/elputrachh/tokyo-loader/main/tokyo.lua"},
+    {"SNOWY HUB", "https://flowauth.net/v1/ui/a87f00d9adf63658655fcd02ab86a4ef.lua"},
+    {"CATBOX HUB", "https://files.catbox.moe/nqirit.txt"},
+    {"JFA SCRIPT 1", "https://pastebin.com/raw/ei88HJu5"},
+    {"JFA SCRIPT 2", "https://scriptkeysystem.com/loader/afe4dbc89c106d352cec.lua", true}
+}
+
+for _, data in ipairs(jfaScripts) do
+    Tabs.JFA:AddButton({
+        Title = data[1],
+        Description = "JFA script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2], data[3]))() end)
+            Fluent:Notify({ Title = "JFA Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- Anime Dice Scripts Tab
+Tabs.AnimeDice:AddParagraph({ Title = "Anime Dice Scripts Collection", Content = "Anime Dice scripts, hubs, and utilities." })
+local animeDiceScripts = {
+    {"OUROBOROS HUB", "https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"},
+    {"PROJECT MADARA HUB", "https://raw.githubusercontent.com/IsThisMe01/Project-Madara/refs/heads/main/animedice.lua"},
+    {"SERENITY HUB", "https://raw.githubusercontent.com/MUshihara/Serenity-hub/main/loader.lua"},
+    {"FYNESSED HUB", "https://raw.githubusercontent.com/AhmadV6/StealAnEgg/refs/heads/main/FynessedHub"},
+    {"AD SCRIPT 1", "https://pastebin.com/raw/9hSMJ9aX"},
+    {"GOHA HUB", "https://api.goha.dev/loader"},
+    {"JEN LUCK BOOSTERS V1", "https://raw.githubusercontent.com/mallu837/jenluckbooster/refs/heads/main/animedice/luck.loader"},
+    {"SF HUB", "https://pastefy.app/BERZUvRh/raw"},
+    {"SEISEN HUB", "https://api.jnkie.com/api/v1/luascripts/public/8ac2e97282ac0718aeeb3bb3856a2821d71dc9e57553690ab508ebdb0d1569da/download"},
+    {"BP HUB", "https://api.luarmor.net/files/v4/loaders/467778b7e06d29cb032367938bfa7210.lua"},
+    {"CM HUB", "https://cmhub-key-system.vercel.app/roblox/loader.lua"},
+    {"ALTER HUB", "https://alterhub.site/loader.lua"},
+    {"BCODE HUB", "https://api.jnkie.com/api/v1/luascripts/public/8a4b2c9584c524bea8913d7eeeca2bc69027db3844b9078a4b08365a48471d68/download"},
+    {"NASI RENDANG HUB", "https://raw.githubusercontent.com/JualNasiRendang/loader/refs/heads/main/main.lua"}
+}
+
+for _, data in ipairs(animeDiceScripts) do
+    Tabs.AnimeDice:AddButton({
+        Title = data[1],
+        Description = "Anime Dice script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "Anime Dice Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- SAB Tab
+Tabs.SAB:AddParagraph({ Title = "SAB Scripts Collection", Content = "Steal a Brainrot community scripts and hubs." })
+local sabScripts = {
+    {"CHILLI HUB", "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"},
+    {"UGLY HUB", "https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"},
+    {"ECHO HUB", "https://raw.githubusercontent.com/acesolos/Echo/refs/heads/main/hehe"},
+    {"CARTOLA HUB", "https://pastefy.app/CJpKxSAv/raw"},
+    {"AJJANS HUB", "https://raw.githubusercontent.com/Atom1gg/Umbrella/refs/heads/main/Loader.lua"},
+    {"MAKU HUB", "https://raw.githubusercontent.com/Makuscripts/Steal-A-Brainrot/refs/heads/main/SAB-OPSCRIPT.lua"},
+    {"DENJI HUB", "https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"},
+    {"ARBIX HUB", "https://raw.githubusercontent.com/Youifpg/Steal-a-Brianrot/refs/heads/main/Slowversion.lua"},
+    {"GHOST HUB", "https://raw.githubusercontent.com/Akbar123s/Script-Roblox-/refs/heads/main/Script%20Brainrot%20New"},
+    {"NEOX HUB", "https://raw.githubusercontent.com/hassanxzayn-lua/NEOXHUBMAIN/refs/heads/main/StealABrainrot"}
+}
+for _, data in ipairs(sabScripts) do
+    Tabs.SAB:AddButton({
+        Title = data[1],
+        Description = "SAB script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "SAB Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- SAK Tab
+Tabs.SAK:AddParagraph({ Title = "SAK Scripts Collection", Content = "SAK community scripts and hubs." })
+local sakScripts = {
+    {"HEARTAGRAM HUB", "https://raw.githubusercontent.com/OlejenkaMolejenka1337/script/refs/heads/main/scriptOBF.txt"},
+    {"AVERLIK HUB", "https://raw.githubusercontent.com/Tarmaster/AverlikHub/refs/heads/main/Loader"},
+    {"AJJANS HUB", "https://api.luarmor.net/files/v4/loaders/359e97f8618e9008afe5f496184ebb7c.lua"},
+    {"RIFT HUB", "https://rifton.top/loader.lua"},
+    {"ORVA HUB", "https://raw.githubusercontent.com/OrvaEvncp/Orva/refs/heads/main/Speed_Keyboard.lua"},
+    {"PIG HUB", "https://raw.githubusercontent.com/mopsscript7-gif/loader1/refs/heads/main/keyboard", true},
+    {"SHIZA HUB", "https://raw.githubusercontent.com/Gerreiro68/ShizaHub/refs/heads/main/loader.lua"},
+    {"GALACTIC HUB", "https://api.jnkie.com/api/v1/luascripts/public/4386aea55612ce01731b47a200b9279bdd9edb81f99334a11e874017e5810257/download"},
+    {"LUXY HUB", "https://www.luxyhub.space/api/loader/luxyhub"},
+    {"HOSHI HUB", "HOSHI"}
+}
+for _, data in ipairs(sakScripts) do
+    if data[1] == "HOSHI HUB" then
+        Tabs.SAK:AddButton({
+            Title = data[1],
+            Description = "SAK script loader",
+            Callback = function()
+                pcall(function()
+                    getgenv().script_key = "Free_key"
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/Fluxyyy333/HoshiOnTop/main/loader.lua"))()
+                end)
+                Fluent:Notify({ Title = "SAK Scripts", Content = data[1] .. " executed!", Duration = 3 })
+            end
+        })
+    else
+        Tabs.SAK:AddButton({
+            Title = data[1],
+            Description = "SAK script loader",
+            Callback = function()
+                pcall(function() loadstring(game:HttpGet(data[2], data[3]))() end)
+                Fluent:Notify({ Title = "SAK Scripts", Content = data[1] .. " executed!", Duration = 3 })
+            end
+        })
+    end
+end
+
+-- RAP Tab
+Tabs.RAP:AddParagraph({ Title = "RAP Scripts Collection", Content = "Keyless RAP scripts and hubs." })
+local rapScripts = {
+    {"NEMO HUB", "https://raw.githubusercontent.com/NemoScripts/NemoHubGames/main/besthub"},
+    {"OUROBORUS HUB", "https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"},
+    {"RAP SCRIPT", "https://raw.githubusercontent.com/GZSSF/RideAPetV2/refs/heads/main/RideAPetV2"},
+    {"RAP SCRIPT 2", "https://flowauth.net/v1/loaders/6d575d95b31568c868115392828e7df0.lua"},
+    {"BLYXO HUB", "https://flowauth.net/v1/loaders/1d8892dc79719bebaad7bac289e338c9.lua"},
+    {"ZANJI HUB", "https://raw.githubusercontent.com/jr0nzz/rap/refs/heads/main/rap.lua"},
+    {"SERENITY HUB", "https://raw.githubusercontent.com/MUshihara/Serenity-hub/main/loader.lua"}
+}
+for _, data in ipairs(rapScripts) do
+    Tabs.RAP:AddButton({
+        Title = data[1],
+        Description = "Keyless script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "RAP Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- Karinderya Tab
+Tabs.Karinderya:AddParagraph({ Title = "Karinderya Scripts Collection", Content = "Karinderya scripts, auto farm, and hubs." })
+local karinderyaScripts = {
+    {"AUTO KARINDERYA", "https://rawscripts.net/raw/Karinderya!-KEYLESS-Auto-buy-Serve-Auto-Staff-AutoBuy-Auto-Upgrades-228018"},
+    {"VEX HUB", "https://raw.githubusercontent.com/cvjhvc/vexsaken/refs/heads/main/vex-main.loader"}
+}
+for _, data in ipairs(karinderyaScripts) do
+    Tabs.Karinderya:AddButton({
+        Title = data[1],
+        Description = "Karinderya script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "Karinderya Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- Blox Fruit Tab
+Tabs.BloxFruit:AddParagraph({ Title = "Blox Fruit Scripts Collection", Content = "Popular Blox Fruit hubs and scripts." })
+local bloxScripts = {
+    {"NERU HUB", "https://raw.githubusercontent.com/NeroHubClub/AutoMythicFruitFinder/refs/heads/main/NeroHubFruitFinder"},
+    {"LEAF HUB", "https://leaf-zeta.onrender.com/api/script"},
+    {"MARU HUB", "https://raw.githubusercontent.com/LuaCrack/KimP/refs/heads/main/MaruHub"},
+    {"ASTRAL HUB", "https://raw.githubusercontent.com/Vcsk/AstralHub/main/Main.lua"},
+    {"SPEED HUB X", "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {"COKKA HUB", "https://raw.githubusercontent.com/UserDevEthical/Loadstring/main/CokkaHub.lua"},
+    {"NIGHT HUB ONTOP", "https://raw.githubusercontent.com/NIGHTHUBONTOP/Main/main/NightHub.lua"},
+    {"RAITO HUB", "https://raw.githubusercontent.com/Efe0626/RaitoHub/main/Script"},
+    {"THAN HUB", "https://raw.githubusercontent.com/thantzy/thanhub/refs/heads/main/thanv1"},
+    {"BACON HUB", "https://raw.githubusercontent.com/BaconScriptHub/BaconHub/main/New-BaconHub.lua.txt"},
+    {"VXEXPRESS HUB", "https://raw.githubusercontent.com/Dex-Bear/Vxezehub/refs/heads/main/VxezeHubMain"},
+    {"HERMANOS HUB", "https://api.luapolsec.top/files/v4/loaders/f980e8a1433349b5a296f864fa7b55bc.lua"},
+    {"QUANTOM ONYX HUB", "https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"},
+    {"ONION HUB", "https://raw.githubusercontent.com/onion132005-bit/esponion.lua/refs/heads/main/onion13v9.lua"},
+    {"GRAVITY HUB", "https://raw.githubusercontent.com/Dev-GravityHub/BluxFruit/refs/heads/main/Main.lua"},
+    {"HOHO HUB", "https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"},
+    {"BLUE-X HUB", "https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"},
+    {"REDZ HUB", "https://raw.githubusercontent.com/luraobermeyer-jpg/redzhub/refs/heads/main/redzhub.lua.txt"},
+    {"NIGHT HUB", "https://github.com/WhiteX1208/Scripts/blob/main/HopScript.luau?raw=true"},
+    {"BANANA HUB", "https://raw.githubusercontent.com/obiyeueim/vthangsitink/main/BananaHub.lua"},
+    {"ALCHEMY HUB", "https://scripts.alchemyhub.xyz"},
+    {"RUBY HUB", "https://raw.githubusercontent.com/bloxfruitsnokey/Redz/refs/heads/main/Ruby/load.luau"},
+    {"TEDDY HUB", "https://raw.githubusercontent.com/teddyhubdev/diepvy/refs/heads/main/TeddyHub.lua"}
+}
+for _, data in ipairs(bloxScripts) do
+    Tabs.BloxFruit:AddButton({
+        Title = data[1],
+        Description = "Blox Fruit script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "Blox Fruit Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- MM2 Tab
+Tabs.MM2:AddParagraph({ Title = "MM2 Scripts Collection", Content = "Murder Mystery 2 scripts and hubs." })
+local mm2Scripts = {
+    {"WAGURI HUB", "https://raw.githubusercontent.com/Waguriiiii/Murder-mystery-2/refs/heads/main/Waguri.lua"},
+    {"VERTEX HUB", "https://raw.smokingscripts.org/vertex.lua"},
+    {"THUNDER HUB", "https://raw.githubusercontent.com/thunderXhub/ThunderXHUB/refs/heads/main/loader"},
+    {"YARHM HUB", "https://yarhm.com"},
+    {"NEXUS HUB", "https://raw.githubusercontent.com/Lkmojjla/Nexus/main/Mm2script"},
+    {"RUFU HUB", "https://raw.githubusercontent.com/lechayy/RufuMM2/refs/heads/main/MM2.lua"},
+    {"MINR HUB", "https://raw.githubusercontent.com/MineRoma/MRHUBNEW_UNI/refs/heads/main/mm2"},
+    {"AYZEN HUB", "https://raw.githubusercontent.com/ayzen-mm2/Loader/refs/heads/main/MM2.LUA"},
+    {"AVOEZ HUB", "https://raw.githubusercontent.com/AvoEZScripts/Murder-Mystery-2/refs/heads/main/AvoEZ%20Hub"},
+    {"SLIX HUB", "https://raw.githubusercontent.com/Azura83/Murder-Mystery-2/refs/heads/main/Script.lua"},
+    {"SP HUB", "https://raw.githubusercontent.com/as6cd0/SP_Hub/refs/heads/main/Loader"}
+}
+for _, data in ipairs(mm2Scripts) do
+    Tabs.MM2:AddButton({
+        Title = data[1],
+        Description = "MM2 script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "MM2 Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- Blade Ball Tab
+Tabs.BladeBall:AddParagraph({ Title = "Blade Ball Scripts Collection", Content = "Blade Ball scripts, hubs, and changers." })
+local bbScripts = {
+    {"KAZZ HUB", "https://api.jnkie.com/api/v1/loaders/public/353accd2d41a5a30c879705a8ff47926fab2c8b7d7baf34d31c0522b8c6c0a41/download"},
+    {"DRYX HUB", "https://raw.githubusercontent.com/Doortthemort/676/refs/heads/main/Main.lua"},
+    {"RISE HUB", "https://raw.githubusercontent.com/joshhhie/rise/refs/heads/main/loader.lua"},
+    {"ARCENEY HUB", "https://arceney.win/cdn/loader.luau?v=scrb"},
+    {"WINGS HUB", "https://wings.ac/loader"},
+    {"NEXUS HUB", "https://api.junkie-development.de/api/v1/luascripts/public/c458c939651a0abd1aa5898726665597ab7ed51952b694f518f43333f85628ec/download"},
+    {"SKIN CHANGER", "https://api.getpolsec.com/scripts/0aeb2ed63d72925a96c7987887163935.txt"},
+    {"VICO X HUB", "https://pastebin.com/raw/MxbN5chy"},
+    {"ARGON HUB", "https://raw.githubusercontent.com/luwriy/jwhub/refs/heads/main/loader"},
+    {"SOLUNA HUB", "https://raw.githubusercontent.com/Patheticcs/Soluna-API/refs/heads/main/bladeball.lua"},
+    {"REDZ HUB", "https://raw.githubusercontent.com/REDzHUB/BladeBall/main/eng"}
+}
+for _, data in ipairs(bbScripts) do
+    Tabs.BladeBall:AddButton({
+        Title = data[1],
+        Description = "Blade Ball script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "Blade Ball Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- TSB Tab
+Tabs.TSB:AddParagraph({ Title = "TSB Scripts Collection", Content = "The Strongest Battlegrounds scripts, hubs, and tools." })
+local tsbScripts = {
+    {"NO CD", "https://raw.githubusercontent.com/Emerson2-creator/Scripts-Roblox/refs/heads/main/TSBLuna.lua"},
+    {"PHANTASM HUB", "https://raw.githubusercontent.com/ATrainz/Phantasm/refs/heads/main/Games/TSB.lua"},
+    {"SPOOKY HUB", "https://raw.githubusercontent.com/ApparentlySpooks/spookshubTSB/refs/heads/main/SHTSB.txt"},
+    {"SPEED HUB", "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/SpeedHubX.lua"},
+    {"KUKURI CLIENT HUB", "https://raw.githubusercontent.com/Mikasuru/Arc/refs/heads/main/Arc.lua"},
+    {"TAM HUB", "https://raw.githubusercontent.com/tamarixr/tamhub/main/bettertamhub.lua"},
+    {"ARCH VAULT HUB", "https://pastebin.com/raw/R2N7cb9z"},
+    {"JN HUB", "https://raw.githubusercontent.com/JNHHGaming/The-strong-battlegrounds/refs/heads/main/Tsb"},
+    {"VEXON HUB", "https://raw.githubusercontent.com/DiosDi/VexonHub/refs/heads/main/VexonHub"}
+}
+for _, data in ipairs(tsbScripts) do
+    Tabs.TSB:AddButton({
+        Title = data[1],
+        Description = "TSB script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "TSB Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- Rivals Tab
+Tabs.Rivals:AddParagraph({ Title = "Rivals Scripts Collection", Content = "Rivals scripts, aimbots, and hubs." })
+local rivalsScripts = {
+    {"LUAHOOK HUB", "https://api.tsuki.best/scripts/b018c6ff954abb0375b7e883f7bc253f.lua"},
+    {"KORAX HUB", "https://raw.githubusercontent.com/imshrak/rivals/refs/heads/main/main"},
+    {"AVERLIK HUB", "https://raw.githubusercontent.com/Tarmaster/AverlikHub/refs/heads/main/Loader"},
+    {"SKIN CHANGER", "https://scripts.getv3.lol/sportsclub.luau"},
+    {"ELITE ZONE HUB", "https://ez-ez.vercel.app/loader.lua"},
+    {"FLOW HUB", "https://api.luarmor.net/files/v4/loaders/5946add9ab91f1e04cb005346a8b1968.lua"},
+    {"ATHER HUB", "https://api.luarmor.net/files/v3/loaders/2529a5f9dfddd5523ca4e22f21cceffa.lua"},
+    {"JN HUB", "https://raw.githubusercontent.com/JNHHGaming/Rivals-Script/refs/heads/main/JN%20HH%20Gaming"},
+    {"SAINT HUB", "https://raw.githubusercontent.com/tokyotokyo-dev/rivals/refs/heads/main/rivalsaimwh.lua"},
+    {"LUMIN HUB", "http://luminon.top/loader.lua"}
+}
+for _, data in ipairs(rivalsScripts) do
+    Tabs.Rivals:AddButton({
+        Title = data[1],
+        Description = "Rivals script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "Rivals Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- 99 Nights Tab
+Tabs.Nights99:AddParagraph({ Title = "99 Nights Scripts Collection", Content = "99 Nights in the Forest scripts and hubs." })
+local nightsScripts = {
+    {"FOXNAME HUB", "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FoxnameHub.lua"},
+    {"VOIDWARE HUB", "https://rawscripts.net/raw/99-Nights-in-the-Forest-SNOW-BIOME-KEYLESS-BEST-99-NIGHTS-IN-THE-FOREST-SCRIPT-VOIDWARE-47274"},
+    {"AXONIC HUB", "https://raw.githubusercontent.com/Kenniel123/99-Nights-in-the-Forest/refs/heads/main/99%20Nights%20in%20the%20Forest"},
+    {"KUROMI HUB", "https://pastefy.app/xKUiQ3CI/raw"},
+    {"FAST HUB", "https://raw.githubusercontent.com/adibhub1/99-nighit-in-forest/refs/heads/main/99%20night%20in%20forest"},
+    {"VYLERA HUB", "https://raw.githubusercontent.com/vylerascripts/vylera-scripts/main/99nightsforest.lua"},
+    {"COBRA HUB", "https://raw.githubusercontent.com/Backwoodsix/Cobra.gg-99-nights-in-the-Forrest-FREE-keyless-/refs/heads/main/.lua"},
+    {"RONIX HUB", "https://api.luarmor.net/files/v3/loaders/fda9babd071d6b536a745774b6bc681c.lua"},
+    {"AXON HUB", "https://api.luarmor.net/files/v3/loaders/97c3f6db55a2cf72141537a85458e5a7.lua"},
+    {"HORIZON HUB", "https://raw.githubusercontent.com/Laspard69/HorizonHub/refs/heads/main/loader.lua"}
+}
+for _, data in ipairs(nightsScripts) do
+    Tabs.Nights99:AddButton({
+        Title = data[1],
+        Description = "99 Nights script loader",
+        Callback = function()
+            pcall(function() loadstring(game:HttpGet(data[2]))() end)
+            Fluent:Notify({ Title = "99 Nights Scripts", Content = data[1] .. " executed!", Duration = 3 })
+        end
+    })
+end
+
+-- Shaders Tab
+Tabs.Shaders:AddParagraph({ Title = "Shaders Scripts Collection", Content = "Visual graphic enhancements and shaders." })
+Tabs.Shaders:AddButton({
+    Title = "UNIVERSE GRAPHICS",
+    Description = "Executes Universe Graphics",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Uranus197/-Univers-Hub-Graphics-Script-/refs/heads/main/UniversHub"))() end)
+        Fluent:Notify({ Title = "Shaders Scripts", Content = "Universe Graphics executed!", Duration = 3 })
+    end
+})
+Tabs.Shaders:AddButton({
+    Title = "PSHADE",
+    Description = "Executes PSHADE Ultimate",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet('https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua'))() end)
+        Fluent:Notify({ Title = "Shaders Scripts", Content = "Pshade executed!", Duration = 3 })
+    end
+})
+Tabs.Shaders:AddButton({
+    Title = "SIMPLE SHADE",
+    Description = "Executes Simple Shade",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))() end)
+        Fluent:Notify({ Title = "Shaders Scripts", Content = "Simple Shade executed!", Duration = 3 })
+    end
+})
+
+-- Emotes Tab
+Tabs.Emotes:AddParagraph({ Title = "Emotes & Animations Collection", Content = "Universal custom emotes and animation scripts." })
+Tabs.Emotes:AddButton({
+    Title = "EMOTES / ANIMATIONS",
+    Description = "Executes Universal Emote script",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-7yd7-I-Emote-Script-48024"))() end)
+        Fluent:Notify({ Title = "Emotes & Animations", Content = "Emote script executed!", Duration = 3 })
+    end
+})
+
+-- Avatars Tab
+Tabs.Avatars:AddParagraph({ Title = "Avatars Scripts Collection", Content = "Visual avatar changers and customization tools." })
+Tabs.Avatars:AddButton({
+    Title = "VISUAL AVATAR CHANGER",
+    Description = "Executes Visual Avatar Changer script",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/rysted-rbx/free/main/changeAvatarVisual"))() end)
+        Fluent:Notify({ Title = "Avatars", Content = "Visual Avatar Changer executed!", Duration = 3 })
+    end
+})
+
+-- Promoters Tab
+Tabs.Promoters:AddParagraph({ Title = "Promoters Collection", Content = "Official hub promoters and social links." })
+Tabs.Promoters:AddButton({
+    Title = "RAYY’S TIKTOK",
+    Description = "Copies @asianrayyy666 to your clipboard",
+    Callback = function()
+        if setclipboard then
+            setclipboard("@asianrayyy666")
+            Fluent:Notify({ Title = "Copied!", Content = "TikTok username @asianrayyy666 copied to clipboard.", Duration = 3 })
+        else
+            Fluent:Notify({ Title = "Error", Content = "Your executor does not support setclipboard.", Duration = 3 })
+        end
+    end
+})
+
+-- Settings Tab
+do
+    local InterfaceSection = Tabs.Settings:AddSection("Interface")
+
+    InterfaceSection:AddDropdown("InterfaceTheme", {
+        Title = "Theme",
+        Description = "Changes the interface theme.",
+        Values = Fluent.Themes,
+        Default = Fluent.Theme,
+        Callback = function(Value)
+            Fluent:SetTheme(Value)
+        end
+    })
+
+    if Fluent.UseAcrylic then
+        InterfaceSection:AddToggle("AcrylicToggle", {
+            Title = "Acrylic",
+            Description = "The blurred background requires graphic quality 8+",
+            Default = Fluent.Acrylic,
+            Callback = function(Value)
+                Fluent:ToggleAcrylic(Value)
+            end
+        })
+    end
+
+    InterfaceSection:AddToggle("TransparentToggle", {
+        Title = "Transparency",
+        Description = "Makes the interface transparent.",
+        Default = Fluent.Transparency,
+        Callback = function(Value)
+            Fluent:ToggleTransparency(Value)
+        end
+    })
+end
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "KAZEE HUB V3.0 PREMIUM",
+    Content = "Successfully loaded and fully executed!",
+    Duration = 5
+})
+
