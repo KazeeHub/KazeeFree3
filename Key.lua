@@ -7,7 +7,7 @@ local Config = {
     Secret          = "KazeeHub010614", -- This makes the script ONLY run from the key script. Even if they copy the original obfuscated script to bypass the key, they won't be able to!
     
     -- [3] Scripts & Links
-    MainScriptURL   = "loadstring(game:HttpGet("https://flowauth.net/v1/loaders/134235395547048c7f178183076b4dc9.lua"))()", -- The raw URL of your main script
+    MainScriptURL   = "https://flowauth.net/v1/loaders/134235395547048c7f178183076b4dc9.lua", -- The raw URL of your main script
     
     -- [4] Social Media Settings (Set to true to show, false to hide)
     ShowDiscord     = false,
